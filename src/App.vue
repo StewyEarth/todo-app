@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Todo personName="Jason" />
+    <Todo/>
   </div>
 </template>
 
