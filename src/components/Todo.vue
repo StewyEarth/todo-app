@@ -1,6 +1,17 @@
 <template>
   <div id="todo">
-    <h1>Add things To do 🔥</h1>
+    <div class="todolists">
+      <div v-for="(list,index) in lists" :key="index" class="todo-item">
+        <button
+          class="tabbutton"
+          :class="{'tabbutton--active':currentlist == index}"
+          v-on:click="currentlist = index"
+        >{{list.name}}</button>
+      </div>
+      <button class="tabbutton addlistbtn">+</button>
+    </div>
+    <h1>{{lists[this.currentlist].name}}</h1>
+    <h2>Add things To do 🔥</h2>
     <div class="tabmenu">
       <button
         class="tabbutton"
@@ -35,7 +46,13 @@
     </div>
     <div class="todo-bottom">
       <div>
-        <input v-on:change="changeall" type="checkbox" name id="completeall" :checked="anyRemaining" />
+        <input
+          v-on:change="changeall"
+          type="checkbox"
+          name
+          id="completeall"
+          :checked="anyRemaining"
+        />
         <label for="completeall">Check/uncheck all</label>
       </div>
       <div>
@@ -52,21 +69,47 @@ export default {
     return {
       newTodo: "",
       filter: "all",
-      todos: [
+      currentlist: 0,
+      lists: [
         {
-          id: 0,
-          title: "Thing 1",
-          completed: true
+          name: "Trashlist",
+          todos: [
+            {
+              id: 0,
+              title: "Thing 1",
+              completed: true
+            },
+            {
+              id: 1,
+              title: "Thing 2",
+              completed: false
+            },
+            {
+              id: 2,
+              title: "Thing 3",
+              completed: false
+            }
+          ]
         },
         {
-          id: 1,
-          title: "Thing 2",
-          completed: false
-        },
-        {
-          id: 2,
-          title: "Thing 3",
-          completed: false
+          name: "Baskelisten",
+          todos: [
+            {
+              id: 0,
+              title: "Ralle",
+              completed: true
+            },
+            {
+              id: 1,
+              title: "Mikkel",
+              completed: false
+            },
+            {
+              id: 2,
+              title: "Niklaz",
+              completed: false
+            }
+          ]
         }
       ]
     };
@@ -75,7 +118,7 @@ export default {
     addTodo() {
       // `this` inside methods points to the Vue instance
       if (this.newTodo != "") {
-        this.todos.push({
+        this.lists[this.currentlist].todos.push({
           title: this.newTodo,
           id: new Date().getTime(),
           completed: false
@@ -84,43 +127,43 @@ export default {
       }
     },
     removeTodo(itemID) {
-      this.todos.forEach((todo, index) => {
+      this.lists[this.currentlist].todos.forEach((todo, index) => {
         if (todo.id == itemID) {
-          this.todos.splice(index, 1);
+          this.lists[this.currentlist].todos.splice(index, 1);
         }
       });
       // this.todos.splice(index, 1);
     },
     ChangeTodoCompletion(itemID) {
       let status = false;
-      this.todos.forEach((todo, index) => {
+      this.lists[this.currentlist].todos.forEach((todo, index) => {
         if (todo.id == itemID) {
-          if (!this.todos[index].completed) {
+          if (!this.lists[this.currentlist].todos[index].completed) {
             status = true;
           }
-          this.todos[index].completed = status;
+          this.lists[this.currentlist].todos[index].completed = status;
         }
       });
     },
-    changeall(){
-      this.todos.forEach(todo=>{
-        todo.completed = event.target.checked
-      })
+    changeall() {
+      this.lists[this.currentlist].todos.forEach(todo => {
+        todo.completed = event.target.checked;
+      });
     }
   },
   computed: {
     todosFiltered() {
       if (this.filter == "all") {
-        return this.todos;
+        return this.lists[this.currentlist].todos;
       } else if (this.filter == "completed") {
-        return this.todos.filter(todo => todo.completed);
+        return this.lists[this.currentlist].todos.filter(todo => todo.completed);
       } else if (this.filter == "notcompleted") {
-        return this.todos.filter(todo => !todo.completed);
+        return this.lists[this.currentlist].todos.filter(todo => !todo.completed);
       }
-      return this.todos;
+      return this.lists[this.currentlist].todos;
     },
     remaining() {
-      return this.todos.filter(todo => !todo.completed).length;
+      return this.lists[this.currentlist].todos.filter(todo => !todo.completed).length;
     },
     anyRemaining() {
       return this.remaining == 0;
@@ -167,6 +210,11 @@ p {
   color: gray;
   text-decoration-color: black;
 }
+.todolists {
+  text-align: left;
+  display: flex;
+}
+
 .todo-bottom {
   display: flex;
   justify-content: space-between;
@@ -200,5 +248,10 @@ p {
 }
 .tabbutton:last-of-type {
   margin-right: 0;
+}
+
+.addlistbtn{
+  border: none;
+  border-radius: 50%
 }
 </style>
