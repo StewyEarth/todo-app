@@ -2,13 +2,25 @@
   <div id="todo">
     <h1>Add things To do 🔥</h1>
     <div class="tabmenu">
-      <button class=" tabbutton" :class="{'tabbutton--active':filter == 'all'}" v-on:click="filter = 'all'">All</button>
-      <button class="tabbutton" :class="{'tabbutton--active':filter == 'completed' }"  v-on:click="filter = 'completed'">Completed</button>
-      <button class="tabbutton" :class="{'tabbutton--active':filter == 'notcompleted'}"  v-on:click="filter = 'notcompleted'">Not Completed</button>
+      <button
+        class="tabbutton"
+        :class="{'tabbutton--active':filter == 'all'}"
+        v-on:click="filter = 'all'"
+      >All</button>
+      <button
+        class="tabbutton"
+        :class="{'tabbutton--active':filter == 'completed' }"
+        v-on:click="filter = 'completed'"
+      >Completed</button>
+      <button
+        class="tabbutton"
+        :class="{'tabbutton--active':filter == 'notcompleted'}"
+        v-on:click="filter = 'notcompleted'"
+      >Not Completed</button>
     </div>
     <input
-      type="“text”"
-      class="“nes-input”"
+      type="text"
+      class="addtodo"
       placeholder="Add todo…"
       v-model="newTodo"
       v-on:keyup.enter="addTodo"
@@ -17,9 +29,18 @@
       <div
         class="todo-title"
         :class="{ 'todo-completed': todo.completed }"
-        v-on:click="ChangeTodoCompletion(index)"
+        v-on:click="ChangeTodoCompletion(todo.id)"
       >{{ todo.title }}</div>
-      <div class="todo-remove" v-on:click="removeTodo(index)">&times;</div>
+      <div class="todo-remove" v-on:click="removeTodo(todo.id)">&times;</div>
+    </div>
+    <div class="todo-bottom">
+      <div>
+        <input v-on:change="changeall" type="checkbox" name id="completeall" :checked="anyRemaining" />
+        <label for="completeall">Complete all</label>
+      </div>
+      <div>
+        <p>items left: {{remaining}}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -34,17 +55,17 @@ export default {
       todos: [
         {
           id: 0,
-          title: "Yeet",
+          title: "Thing 1",
           completed: true
         },
         {
           id: 1,
-          title: "Skeet",
+          title: "Thing 2",
           completed: false
         },
         {
           id: 2,
-          title: "Delete",
+          title: "Thing 3",
           completed: false
         }
       ]
@@ -62,28 +83,47 @@ export default {
         this.newTodo = "";
       }
     },
-    removeTodo(index) {
-      // `this` inside methods points to the Vue instance
-      this.todos.splice(index, 1);
+    removeTodo(itemID) {
+      this.todos.forEach((todo, index) => {
+        if (todo.id == itemID) {
+          this.todos.splice(index, 1);
+        }
+      });
+      // this.todos.splice(index, 1);
     },
-    ChangeTodoCompletion(index) {
+    ChangeTodoCompletion(itemID) {
       let status = false;
-      if (!this.todos[index].completed) {
-        status = true;
-      }
-      this.todos[index].completed = status;
+      this.todos.forEach((todo, index) => {
+        if (todo.id == itemID) {
+          if (!this.todos[index].completed) {
+            status = true;
+          }
+          this.todos[index].completed = status;
+        }
+      });
+    },
+    changeall(){
+      this.todos.forEach(todo=>{
+        todo.completed = event.target.checked
+      })
     }
   },
-  computed:{
-    todosFiltered(){
-      if (this.filter == "all"){
-        return this.todos
-      }else if (this.filter == "completed"){
-        return this.todos.filter(todo => todo.completed)
-      }else if(this.filter == "notcompleted"){
-        return this.todos.filter(todo => !todo.completed)
+  computed: {
+    todosFiltered() {
+      if (this.filter == "all") {
+        return this.todos;
+      } else if (this.filter == "completed") {
+        return this.todos.filter(todo => todo.completed);
+      } else if (this.filter == "notcompleted") {
+        return this.todos.filter(todo => !todo.completed);
       }
-      return this.todos
+      return this.todos;
+    },
+    remaining() {
+      return this.todos.filter(todo => !todo.completed).length;
+    },
+    anyRemaining() {
+      return this.remaining == 0;
     }
   }
 };
@@ -93,15 +133,18 @@ export default {
 a {
   text-decoration: none;
 }
+p {
+  margin: 0;
+}
 #todo {
   width: 60%;
   margin: 0 auto;
 }
-input {
+.addtodo {
   padding: 1em;
   width: 100%;
   box-sizing: border-box;
-  margin-bottom: 3em;
+  margin-bottom: 2em;
 }
 .todo-item {
   display: flex;
@@ -124,16 +167,32 @@ input {
   color: gray;
   text-decoration-color: black;
 }
-.tabmenu{
+.todo-bottom {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid black;
+  margin-top: 1em;
+  padding: 1em 0;
+}
+#completeall {
+  margin: 0 0.5em 0 0;
+}
+.tabmenu {
   margin-bottom: 1em;
 }
 .tabbutton {
+  cursor: pointer;
   border: none;
   background-color: transparent;
   color: #4a4a4a;
   margin-right: 1em;
   border-bottom: 2px solid transparent;
-  padding-bottom: .2em;
+  padding-bottom: 0.2em;
+  transition: all 0.3s;
+}
+.tabbutton:hover {
+  border-bottom-color: #00d1b2;
+  color: #00d1b2;
 }
 .tabbutton--active {
   border-bottom-color: #00d1b2;
