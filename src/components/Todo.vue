@@ -36,7 +36,7 @@
     <div class="todo-bottom">
       <div>
         <input v-on:change="changeall" type="checkbox" name id="completeall" :checked="anyRemaining" />
-        <label for="completeall">Complete all</label>
+        <label for="completeall">Check/uncheck all</label>
       </div>
       <div>
         <p>items left: {{remaining}}</p>
