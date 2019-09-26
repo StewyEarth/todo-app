@@ -8,8 +8,10 @@
           v-on:click="currentlist = index"
         >{{list.name}}</button>
       </div>
-      <button class="tabbutton addlistbtn">+</button>
+      <input type="text" class="listaddinput" v-model="newList" v-on:blur="listAddMode = false" v-on:keyup.enter="addlist" placeholder="List name here" :class="{'hidden':listAddMode == false}">
+      <button class="tabbutton addlistbtn" v-on:click="listAddMode = true">+</button>
     </div>
+
     <h1>{{lists[this.currentlist].name}}</h1>
     <h2>Add things To do 🔥</h2>
     <div class="tabmenu">
@@ -67,9 +69,11 @@ export default {
   name: "todo-list",
   data() {
     return {
+      newList: "",
       newTodo: "",
       filter: "all",
       currentlist: 0,
+      listAddMode: false,
       lists: [
         {
           name: "Trashlist",
@@ -116,7 +120,6 @@ export default {
   },
   methods: {
     addTodo() {
-      // `this` inside methods points to the Vue instance
       if (this.newTodo != "") {
         this.lists[this.currentlist].todos.push({
           title: this.newTodo,
@@ -124,6 +127,19 @@ export default {
           completed: false
         });
         this.newTodo = "";
+      }
+    },
+    addlist() {
+      // `this` inside methods points to the Vue instance
+      if (this.newList != "") {
+        this.lists.push({
+          id: new Date().getTime(),
+          name: this.newList,
+          todos: []
+        });
+        this.listAddMode = false,
+        this.currentlist = this.lists.length - 1;
+        this.newList = "";
       }
     },
     removeTodo(itemID) {
@@ -253,5 +269,16 @@ p {
 .addlistbtn{
   border: none;
   border-radius: 50%
+}
+.listaddinput{
+  margin-left: .2em;
+  padding: 0 0 .2em 0;
+  border: none;
+  transition: all .3s;
+  border-bottom: 2px solid #00d1b2;
+  color: #00d1b2
+}
+.hidden{
+  width: 0;
 }
 </style>
