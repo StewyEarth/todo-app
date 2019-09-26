@@ -1,14 +1,27 @@
 <template>
   <div id="todo">
     <div class="todolists">
-      <div v-for="(list,index) in lists" :key="index" class="todo-item">
+      <div v-for="(list,index) in lists" :key="index" class="todo-list">
         <button
-          class="tabbutton"
+          class="todo-list-btn tabbutton"
           :class="{'tabbutton--active':currentlist == index}"
           v-on:click="currentlist = index"
         >{{list.name}}</button>
+        <button
+          class="tabbutton listremove"
+          v-on:click="removeList(list.id)"
+          :class="{'hidden': lists.length == 1}"
+        >&times;</button>
       </div>
-      <input type="text" class="listaddinput" v-model="newList" v-on:blur="listAddMode = false" v-on:keyup.enter="addlist" placeholder="List name here" :class="{'hidden':listAddMode == false}">
+      <input
+        type="text"
+        class="listaddinput"
+        v-model="newList"
+        v-on:blur="listAddMode = false"
+        v-on:keyup.enter="addlist"
+        placeholder="List name here"
+        :class="{'hidden':listAddMode == false}"
+      />
       <button class="tabbutton addlistbtn" v-on:click="listAddMode = true">+</button>
     </div>
 
@@ -76,6 +89,7 @@ export default {
       listAddMode: false,
       lists: [
         {
+          id: 0,
           name: "Trashlist",
           todos: [
             {
@@ -96,12 +110,13 @@ export default {
           ]
         },
         {
+          id: 1,
           name: "Baskelisten",
           todos: [
             {
               id: 0,
-              title: "Ralle",
-              completed: true
+              title: "Ralle 😭",
+              completed: false
             },
             {
               id: 1,
@@ -110,8 +125,8 @@ export default {
             },
             {
               id: 2,
-              title: "Niklaz",
-              completed: false
+              title: "Niklaz 😈",
+              completed: true
             }
           ]
         }
@@ -137,11 +152,22 @@ export default {
           name: this.newList,
           todos: []
         });
-        this.listAddMode = false,
-        this.currentlist = this.lists.length - 1;
+        (this.listAddMode = false), (this.currentlist = this.lists.length - 1);
         this.newList = "";
       }
     },
+    removeList(listID) {
+      this.lists.forEach((list, index) => {
+        if (list.id == listID) {
+          this.lists.splice(index, 1);
+        }
+      });
+      if (this.currentlist > this.lists.length - 1) {
+        this.currentlist = this.lists.length - 1;
+      }
+      // this.todos.splice(index, 1);
+    },
+
     removeTodo(itemID) {
       this.lists[this.currentlist].todos.forEach((todo, index) => {
         if (todo.id == itemID) {
@@ -172,14 +198,19 @@ export default {
       if (this.filter == "all") {
         return this.lists[this.currentlist].todos;
       } else if (this.filter == "completed") {
-        return this.lists[this.currentlist].todos.filter(todo => todo.completed);
+        return this.lists[this.currentlist].todos.filter(
+          todo => todo.completed
+        );
       } else if (this.filter == "notcompleted") {
-        return this.lists[this.currentlist].todos.filter(todo => !todo.completed);
+        return this.lists[this.currentlist].todos.filter(
+          todo => !todo.completed
+        );
       }
       return this.lists[this.currentlist].todos;
     },
     remaining() {
-      return this.lists[this.currentlist].todos.filter(todo => !todo.completed).length;
+      return this.lists[this.currentlist].todos.filter(todo => !todo.completed)
+        .length;
     },
     anyRemaining() {
       return this.remaining == 0;
@@ -230,6 +261,9 @@ p {
   text-align: left;
   display: flex;
 }
+.todo-list {
+  position: relative;
+}
 
 .todo-bottom {
   display: flex;
@@ -266,19 +300,34 @@ p {
   margin-right: 0;
 }
 
-.addlistbtn{
+.addlistbtn {
   border: none;
-  border-radius: 50%
+  border-radius: 50%;
 }
-.listaddinput{
-  margin-left: .2em;
-  padding: 0 0 .2em 0;
+.listaddinput {
+  padding: 0 0 0.2em 0;
   border: none;
-  transition: all .3s;
-  border-bottom: 2px solid #00d1b2;
-  color: #00d1b2
+  border-bottom: 2px solid #4a4a4a;
 }
-.hidden{
+.listremove {
+  opacity: 0;
+  position: absolute;
+  top: -5%;
+  right: 2%;
+  border: none;
+  padding: 0;
+  color: red;
+}
+.listremove:hover {
+  color: black;
+}
+.todo-list:hover .listremove {
+  opacity: 1;
+}
+
+.hidden {
   width: 0;
+  overflow: hidden;
+  margin: 0;
 }
 </style>
