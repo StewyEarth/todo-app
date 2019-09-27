@@ -1,6 +1,7 @@
 <template>
   <div id="todo">
     <div class="todolists">
+      <h4>Lists:</h4>
       <div v-for="(list,index) in lists" :key="index" class="todo-list">
         <button
           class="todo-list-btn tabbutton"
@@ -25,8 +26,8 @@
       <button class="tabbutton addlistbtn" v-on:click="listAddMode = true">+</button>
     </div>
 
-    <h1>{{lists[this.currentlist].name}}</h1>
-    <h2>Add things To do 🔥</h2>
+    <h1 class="list-title">{{lists[this.currentlist].name}}</h1>
+    <p class="instructions">Add things to do 🔥</p>
     <div class="tabmenu">
       <button
         class="tabbutton"
@@ -51,6 +52,7 @@
       v-model="newTodo"
       v-on:keyup.enter="addTodo"
     />
+    <p v-if="todosFiltered.length == 0">No results found... add or complete something</p>
     <div v-for="(todo,index) in todosFiltered" :key="index" class="todo-item">
       <div
         class="todo-title"
@@ -66,7 +68,7 @@
           type="checkbox"
           name
           id="completeall"
-          :checked="anyRemaining"
+          :checked="noRemaining"
         />
         <label for="completeall">Check/uncheck all</label>
       </div>
@@ -90,7 +92,7 @@ export default {
       lists: [
         {
           id: 0,
-          name: "Trashlist",
+          name: "Todo list",
           todos: [
             {
               id: 0,
@@ -109,27 +111,27 @@ export default {
             }
           ]
         },
-        {
-          id: 1,
-          name: "Baskelisten",
-          todos: [
-            {
-              id: 0,
-              title: "Ralle 😭",
-              completed: false
-            },
-            {
-              id: 1,
-              title: "Mikkel",
-              completed: false
-            },
-            {
-              id: 2,
-              title: "Niklaz 😈",
-              completed: true
-            }
-          ]
-        }
+        // {
+        //   id: 1,
+        //   name: "Baskelisten",
+        //   todos: [
+        //     {
+        //       id: 0,
+        //       title: "Ralle 😭",
+        //       completed: false
+        //     },
+        //     {
+        //       id: 1,
+        //       title: "Mikkel",
+        //       completed: false
+        //     },
+        //     {
+        //       id: 2,
+        //       title: "Niklaz 😈",
+        //       completed: true
+        //     }
+        //   ]
+        // }
       ]
     };
   },
@@ -212,7 +214,7 @@ export default {
       return this.lists[this.currentlist].todos.filter(todo => !todo.completed)
         .length;
     },
-    anyRemaining() {
+    noRemaining() {
       return this.remaining == 0;
     }
   }
@@ -220,6 +222,9 @@ export default {
 </script>
 
 <style scoped>
+h4{
+  margin: 0;
+}
 a {
   text-decoration: none;
 }
@@ -240,8 +245,16 @@ p {
   display: flex;
   justify-content: space-between;
 }
+.list-title{
+  margin: 1em 0 0 0;
+}
+.instructions{
+  margin-bottom: 2em;
+}
 .todo-title {
   cursor: pointer;
+  word-wrap: anywhere;
+  margin-right: 1em;
 }
 .todo-remove {
   color: red;
@@ -260,7 +273,9 @@ p {
 .todolists {
   text-align: left;
   display: flex;
+  flex-wrap: wrap;
 }
+
 .todo-list {
   position: relative;
 }
@@ -320,6 +335,9 @@ p {
 }
 .listremove:hover {
   color: black;
+}
+.todo-list:first-of-type {
+  margin-left: 1em;
 }
 .todo-list:hover .listremove {
   opacity: 1;
